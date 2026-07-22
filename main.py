@@ -1,5 +1,7 @@
 import csv
 import os
+import sqlite3
+from datetime import datetime
 
 print("Life Insurance Premium Calculator")
 
@@ -32,11 +34,20 @@ def calculate_premium(age,coverage,health, is_smoker, term_years):
     premium = base * age_factor * health_factor * smoker_factor * term_factor * (coverage/100000)
 
     return premium
-def print_policty_schedule(monthly_premium):
+def print_policy_schedule(monthly_premium):
     annual_premium = monthly_premium * 12
     milestones = [1, 5, 10, 20]
 
-    print
+    print("\n--- POLICY CASHFLOW PROJECTION ---")
+    for year in milestones:
+        total_paid = annual_premium * year
+        print(f"Year {year}: Monthly: ${monthly_premium: .2f} | Total Paid: ${total_paid:.2f}")
+    print("-----------------------------------\n")
+
+
+##SAVE TO DATABSE
+def save_quote_to_db(name, age, coverage, health, is_smoker, term_years, premium):
+    
 #Name
 name = input("Name: ")
 while True:
@@ -89,3 +100,6 @@ premium = calculate_premium(age, coverage, health, is_smoker, term_years)
 print()
 print("Customer: ", name)
 print("Estimated Monthly Premium: $", premium)
+
+##Generate the Schedule
+print_policy_schedule(premium)
