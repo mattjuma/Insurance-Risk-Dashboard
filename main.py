@@ -44,7 +44,16 @@ def print_policy_schedule(monthly_premium):
         print(f"Year {year}: Monthly: ${monthly_premium: .2f} | Total Paid: ${total_paid:.2f}")
     print("-----------------------------------\n")
 
-
+##exports
+def save_quote_to_csv(name,age, coverage, health, is_smoker, term_years, premium):
+    file_exists = os.path.isfile("quotes.csv")
+    with open("quotes.csv", mode= "a", newline="") as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(["Timestamp","Name","Age","Coverage","Health","Smoker", "Term", "Monthly Premium"])
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        writer.writerow([timestamp,name,age,coverage, health, is_smoker, term_years, round(premium, 2)])
+        print("--> Quote saved to quotes.csv!")
 ##SAVE TO DATABSE
 def save_quote_to_db(name, age, coverage, health, is_smoker, term_years, premium):
     conn = sqlite3.connect("insurance_quotes.db")
@@ -133,15 +142,16 @@ while True:
             print("Please choose a standard term: 10, 20, or 30.")
     except ValueError:
         print("Please enter a valid number (10, 20, or 30).")
-#Run the Calculaton
-premium = calculate_premium(age, coverage, health, is_smoker, term_years)
+#Run the code
+premium_monthly = calculate_premium(age, coverage, health, is_smoker, term_years)
 
 print()
 print("Customer: ", name)
-print("Estimated Monthly Premium: $", premium)
+print("Estimated Monthly Premium: ${premium_monthly:.2f}")
 
 ##Generate the Schedule
-print_policy_schedule(premium)
+print_policy_schedule(premium_monthly)
 
 #SAVE IT
-save_quote_to_db(name, age, coverage, health, is_smoker, term_years, premium)
+save_quote_to_csv(name, age, coverage, health, is_smoker, term_years, premium_monthly)
+save_quote_to_db(name, age, coverage, health, is_smoker, term_years, premium_monthly)
