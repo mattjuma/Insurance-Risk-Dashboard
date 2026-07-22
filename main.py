@@ -47,7 +47,46 @@ def print_policy_schedule(monthly_premium):
 
 ##SAVE TO DATABSE
 def save_quote_to_db(name, age, coverage, health, is_smoker, term_years, premium):
-    
+    conn = sqlite3.connect("insurance_quotes.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS quotes
+    (
+        id
+        INTEGER
+        PRIMARY
+        KEY
+        AUTOINCREMENT,
+        timestamp
+        TEXT,
+        customer_name
+        TEXT,
+        age
+        INTEGER,
+        coverage
+        REAL,
+        health_class
+        TEXT,
+        is_smoker
+        INTEGER,
+        term_years
+        INTEGER,
+        monthly_premium REAL
+    )
+""")
+    #Retrieves the Date
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    #Insert Row
+    cursor.execute("""
+    INSERT INTO quotes (timestamp, customer_name, age, coverage, health_class, is_smoker, term_years, monthly_premium)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+""", (timestamp, name, age, coverage, health, 1 if is_smoker else 0, term_years, round(premium, 2)))
+
+    conn.commit()
+    print("--> Quote is saved to insurance_quotes.db!")
+    conn.close()
 #Name
 name = input("Name: ")
 while True:
@@ -103,3 +142,6 @@ print("Estimated Monthly Premium: $", premium)
 
 ##Generate the Schedule
 print_policy_schedule(premium)
+
+#SAVE IT
+save_quote_to_db(name, age, coverage, health, is_smoker, term_years, premium)
